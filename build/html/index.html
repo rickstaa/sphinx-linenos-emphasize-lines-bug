@@ -1,0 +1,141 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Welcome to sphinx-linenos-emphasize-lines-bug’s documentation! &#8212; sphinx-linenos-emphasize-lines-bug  documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="welcome-to-sphinx-linenos-emphasize-lines-bug-s-documentation">
+<h1>Welcome to sphinx-linenos-emphasize-lines-bug’s documentation!<a class="headerlink" href="#welcome-to-sphinx-linenos-emphasize-lines-bug-s-documentation" title="Permalink to this headline">¶</a></h1>
+<div class="toctree-wrapper compound">
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="lineno"> 1 </span><span class="kn">import</span> <span class="nn">tensorflow</span> <span class="kn">as</span> <span class="nn">tf</span>
+<span class="lineno"> 2 </span><span class="kn">import</span> <span class="nn">os.path</span> <span class="kn">as</span> <span class="nn">osp</span>
+<span class="lineno"> 3 </span>
+<span class="lineno"> 4 </span><span class="kn">from</span> <span class="nn">bayesian_learning_control.utils.log_utils.logx</span> <span class="kn">import</span> <span class="n">EpochLogger</span>
+<span class="lineno"> 5 </span>
+<span class="lineno"> 6 </span><span class="hll"><span class="kn">from</span> <span class="nn">bayesian_learning_control.control.algos.tf2</span> <span class="kn">import</span> <span class="n">LAC</span>
+</span><span class="lineno"> 7 </span>
+<span class="lineno"> 8 </span><span class="n">MODEL_LOAD_FOLDER</span> <span class="o">=</span> <span class="s2">&quot;./data/lac/oscillator-v1/runs/run_1614673367&quot;</span>
+<span class="lineno"> 9 </span><span class="n">MODEL_PATH</span> <span class="o">=</span> <span class="n">osp</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">MODEL_LOAD_FOLDER</span><span class="p">,</span> <span class="s2">&quot;tf2_save&quot;</span><span class="p">)</span>
+<span class="lineno">10 </span>
+<span class="lineno">11 </span><span class="c1"># Restore the model</span>
+<span class="lineno">12 </span><span class="hll"><span class="n">config</span> <span class="o">=</span> <span class="n">EpochLogger</span><span class="o">.</span><span class="n">load_config</span><span class="p">(</span>
+</span><span class="lineno">13 </span><span class="hll">    <span class="n">MODEL_LOAD_FOLDER</span>
+</span><span class="lineno">14 </span><span class="hll"><span class="p">)</span>  <span class="c1"># Retrieve the experiment configuration</span>
+</span><span class="lineno">15 </span><span class="hll"><span class="n">env</span> <span class="o">=</span> <span class="n">EpochLogger</span><span class="o">.</span><span class="n">load_env</span><span class="p">(</span><span class="n">MODEL_LOAD_FOLDER</span><span class="p">)</span>
+</span><span class="lineno">16 </span><span class="n">model</span> <span class="o">=</span> <span class="n">LAC</span><span class="p">(</span><span class="n">env</span><span class="o">=</span><span class="n">env</span><span class="p">,</span> <span class="n">ac_kwargs</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;ac_kwargs&quot;</span><span class="p">])</span>
+<span class="lineno">17 </span><span class="hll"><span class="n">weights_checkpoint</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">latest_checkpoint</span><span class="p">(</span><span class="n">MODEL_PATH</span><span class="p">)</span>
+</span><span class="lineno">18 </span><span class="hll"><span class="n">model</span><span class="o">.</span><span class="n">load_weights</span><span class="p">(</span>
+</span><span class="lineno">19 </span><span class="hll">    <span class="n">weights_checkpoint</span><span class="p">,</span>
+</span><span class="lineno">20 </span><span class="hll"><span class="p">)</span>
+</span><span class="lineno">21 </span>
+<span class="lineno">22 </span><span class="c1"># Create dummy observations and retrieve the best action</span>
+<span class="lineno">23 </span><span class="n">obs</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="n">env</span><span class="o">.</span><span class="n">observation_space</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+<span class="lineno">24 </span><span class="n">a</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">get_action</span><span class="p">(</span><span class="n">obs</span><span class="p">)</span>
+<span class="lineno">25 </span><span class="n">L_value</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">ac</span><span class="o">.</span><span class="n">L</span><span class="p">([</span><span class="n">obs</span><span class="p">,</span> <span class="n">tf</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)])</span>
+<span class="lineno">26 </span>
+<span class="lineno">27 </span><span class="c1"># Print results</span>
+<span class="lineno">28 </span><span class="k">print</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;The LAC agent thinks it is a good idea to take action {a}.&quot;</span><span class="p">)</span>
+<span class="lineno">29 </span><span class="k">print</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;It assigns a Lyapunov Value of {L_value} to this action.&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="indices-and-tables">
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
+<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
+<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
+</ul>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="#">sphinx-linenos-emphasize-lines-bug</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="#">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2022, Rick Staa.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.4.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/index.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
